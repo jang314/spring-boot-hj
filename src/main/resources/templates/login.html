@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div>
+        <h1>로그인</h1>
+    </div>
+    <form method="post" style="
+    width:  500px;
+    border:  1px solid #ccc;
+    margin: 10% auto;
+    padding: 30px;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div>
+            <ul>
+                <li>
+                    <label>아이디</label><input type="text" name="username">
+                </li>
+                <li>
+                    <label>비밀번호</label><input type="password" name="password">
+                </li>
+            </ul>
+        </div>
+        <div>
+            <input type="submit" value="로그인" onclick="validate()">
+        </div>
+        <div>
+            <a href="/signup">회원가입</a>
+        </div>
+    </form>
+    <th:block layout:fragment="script">
+        <script>
+            function validate() {
+                if($("input[name=username]").val().trim().length==0){
+                    alert('아이디를 입력하세요~')
+                    return false
+                }else if($("input[name=password]").val().trim().length==0){
+                    alert("비밀번호를 입력하세요~")
+                    return false
+                }
+                return true;
+            }
+        </script>
+    </th:block>
+</div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+@import url('http://fonts.googleapis.com/earlyaccess/nanumgothic.css');
+div { font-family: 'Nanum Gothic', sans-serif; }
+.header{ width: 100%; margin: 0 auto; min-width: 1100px; border-bottom: 1px solid #ccc; display: inline-block; }
+.header > div { float: right; }
+.header > div ul { float: right; }
+.header > div ul li { list-style: none; display: inline-block;   }
+.haader a { text-decoration: none; color: #000; font-weight: bold; }
+.header a:hover { color: #cccccc; }
+div > ul > li { list-style: none; }
+h1{ text-align:  center; }
+li.on > a{ color: darkred; }
+div.tab > ul > li { display: inline-block; }
+table tr th { padding-right: 10px; text-align: right; }
+p.footer-p { text-align: center; margin-top: 5%; }
+table.plist tr th { text-align:  center;}
+table.plist tr td { text-align: center; border: 1px solid #ddd; }
+
+table.pdetail { border-top: 1px solid #d8d8d8; margin: 0 auto; }
+table.pdetail tr th { height: 50px; border-right: 1px solid #d8d8d8; border-bottom: 1px solid #d8d8d8; }
+table.pdetail tr td { border-bottom: 1px solid #d8d8d8;}

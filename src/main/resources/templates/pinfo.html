@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div>
+        <h1>상품상세보기</h1>
+    </div>
+    <div>
+        <input type="hidden" id="id" th:value="${id}">
+        <form id="form">
+            <table class="pdetail" th:object="${member}">
+                <input type="hidden" name="uid" id="uid" th:value="*{uid}">
+                <tr>
+                    <th>상품명</th>
+                    <td id="name"></td>
+                </tr>
+                <tr>
+                    <th>등록일</th>
+                    <td id="regdate"></td>
+                </tr>
+
+                <tr>
+                    <th>가격</th>
+                    <td id="price"></td>
+                </tr>
+                <tr>
+                    <th>수량선택</th>
+                    <td id="stock">
+                        <select name="amount" id="amount">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select> 개
+                    </td>
+                </tr>
+                <tr>
+                    <th>상세설명</th>
+                    <td id="content"></td>
+                </tr>
+                <tr>
+                    <th>이미지</th>
+                    <td id="img"></td>
+                </tr>
+            </table>
+            <div style="margin-top: 50px; text-align: center;">
+                <a href="#" id="goCart">장바구니</a>
+                <a href="#" id="goBuy">바로구매</a>
+            </div>
+        </form>
+    </div>
+    <th:block>
+        <script th:inline="javascript">
+            var id = $("#id").val();
+            var uid = $("#uid").val();
+            $.getJSON('/product/'+id)
+                .done(function (data) {
+                    $("#name").append( data.pname);
+                    $("#regdate").append(data.regdate);
+                    // $("#stock").append(data.stock);
+                    $("#price").append(data.price);
+                    $("#content").append(data.content);
+                    $("#img").append("<img src='/images/"+ data.file +"'/>")
+                })
+
+            $("#goUpdate").click(function (e) {
+                e.preventDefault();
+                location.href = "/admin/update/"+id;
+            });
+
+
+
+            $("#deleteProd").click(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: '/product',
+                    method: 'delete',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    error: function (xhr, status, error) {
+                        alert('상품삭제에 실패했습니다. ');
+                    },
+                    success: function () {
+                        alert('상품삭제가 완료됐습니다. ');
+                        location.href = "/admin/plist";
+                    }
+                })
+            });
+
+            $("#goCart").click(function (e) {
+                e.preventDefault();
+                var amount = $("select[name=amount]").val();
+                $.getJSON('/cart/isCart/'+id)
+                    .done(function (data) {
+                    if(data===false){
+                        $.ajax({
+                            url: '/cart',
+                            method: 'post',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                uid: uid,
+                                prodId: id,
+                                amount: amount
+
+                            }),
+                            error: function (xhr, status, error) {
+                                alert('장바구니 담기에 실패하였습니다.  ');
+                            },
+                            success: function () {
+                                confirm('장바구니 담기에 성공하였습니다. 장바구니로 이동하시겠습니까?');
+                                if(confirm){
+                                    location.href='/cart';
+                                }
+                            }
+                        })
+                    }else{
+                        confirm('장바구니에 동일한 상품이 있습니다. 그래도 담으시겠습니까? ');
+                        if(confirm){
+                            $.ajax({
+                                url: '/cart',
+                                method: 'put',
+                                contentType: 'application/json',
+                                data: JSON.stringify({
+                                    prodId: id,
+                                }),
+                                error: function (xhr, status, error) {
+                                    alert('장바구니 담기에 실패했습니다. ');
+                                },
+                                success: function () {
+                                    alert('장바구니 담기가 완료됐습니다. ');
+                                }
+                            })
+                        }
+                    }
+                });
+            });
+
+            $("#goBuy").click(function (e) {
+                e.preventDefault();
+                var id = new Array();
+                var amount = new Array();
+                id[0] = $("#id").val();
+                amount[0] = $("select[name=amount]").val();
+                $.ajax({
+                    url: '/order/buy',
+                    method: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id,
+                        amount: amount
+                    }),
+                    error: function (xhr, status, error) {
+                        alert('바로구매하기에 실패하였습니다. ');
+                    },
+                    success: function () {
+                        location.href="/oinfo";
+                    }
+                })
+            });
+        </script>
+    </th:block>
+</div>
+</body>
+</html>

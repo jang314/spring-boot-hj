@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>메인</title>
+</head>
+<style>
+
+</style>
+<body>
+<th:block layout:fragment="css">
+    <script th:inline="javascript"></script>
+</th:block>
+<div layout:fragment="content">
+    <div>
+        <h1>인덱스페이지</h1>
+        <div style="text-align: center">
+            <ul>
+                <li style="display: inline-block;">
+                    <a href="/plist">상품목록</a></li>
+                <li style="display: inline-block">
+                    <a href="/olist">주문내역</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

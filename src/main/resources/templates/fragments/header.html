@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header th:fragment="headerFragment" class="header">
+    <div>
+        <ul th:unless="${isAuth}">
+            <li>
+                <a href="/">홈</a>
+            </li>
+            <li>
+                <a href="/login">로그인</a>
+            </li>
+            <li>
+                <a href="/cart">장바구니</a>
+            </li>
+            <li>
+                <a href="/mypage">마이페이지</a>
+            </li>
+        </ul>
+
+        <ul th:if="${isAuth}">
+            <li>
+                <a href="/">홈</a>
+            </li>
+            <li>
+                <a href="/logout">로그아웃</a>
+            </li>
+            <li>
+                <a href="/cart">장바구니</a>
+            </li>
+            <li>
+                <a href="/mypage">마이페이지</a>
+            </li>
+            <li th:if="${isAdmin}">
+                <a href="/admin">관리자</a>
+            </li>
+        </ul>
+    </div>
+</header>
+</html>

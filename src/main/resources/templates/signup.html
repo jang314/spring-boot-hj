@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+<div layout:fragment="content">
+<form id="joinform" method="post" name="joinform" th:object="${member}" action="/member" enctype="application/json">
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <div>
+        <h1>회원가입</h1>
+    </div>
+    <table>
+        <tr>
+            <th>아이디</th>
+            <td>
+                <input type="text" name="uid" id="uid"><div style="display: inline-block;"><input type="button" id="eid" value="id중복체크">
+                <input type="hidden" id="eval" name="eval" value="">
+            </div>
+
+            </td>
+        </tr>
+
+        <tr>
+            <th>비밀번호</th>
+            <td>
+                <input type="password" name="upw">
+            </td>
+        </tr>
+        <tr>
+            <th>비밀번호 확인</th>
+            <td>
+                <input type="password" name="reupw">
+            </td>
+        </tr>
+        <tr>
+            <th>이름</th>
+            <td>
+                <input type="text" name="uname">
+            </td>
+        </tr>
+        <tr>
+            <th>연락처</th>
+            <td>
+                <input type="text" id="phone" name="phone">
+            </td>
+        </tr>
+        <tr>
+            <th>주소</th>
+            <td>
+                <input type="text" name="address">
+            </td>
+        </tr>
+    </table>
+    <div>
+        <input type="button" id="join-ok" value="가입버튼">
+        <!--<input type="submit" value=",가입">-->
+    </div>
+</form>
+    <th:block layout:fragment="script">
+        <script>
+            $(document).ready(function(){
+                var id = $("#uid");
+                $("#eid").click(function (e) {
+                    e.preventDefault();
+                    $.getJSON('/member/' + id.val())
+                        .done(function (data) {
+                            if(data===true){
+                                $("#eval").val("");
+                                alert('아이디가 존재합니다. ')
+                            }else{
+                                $("#eval").val("exist");
+                                alert('사용가능한 아이디 입니다. ');
+                            }
+                        })
+                });
+
+                $("#join-ok").click(function () {
+                    var phone = $("input[name=phone]").val();
+                    var formdata = $("#joinform").serialize();
+                    if($("#uid").val().trim().length==0){
+                        alert('아이디를입력하세요')
+                    }else if($("#uid").val().trim().length < 3 || $("#uid").val().trim().length >12){
+                        alert('아이디는 4 ~ 12자 내외로 입력하세요. ')
+                    }else if($("input[name=upw]").val().trim().length==0) {
+                        alert('비밀번호를 입력하세요. ')
+                    }else if($("input[name=upw]").val().trim().length < 8 || $("input[name=upw]").val().trim().length >16 ) {
+                        alert('비밀번호는 8 ~ 16자 내외로 입력하세요. ')
+                    }else if($("input[name=reupw]").val()!=$("input[name=upw]").val()){
+                        alert('비밀번호를 확인해주세요')
+                    }else if($("input[name=uname]").val().trim().length == 0){
+                        alert('이름을입력하세요')
+                    }else if($("input[name=phone]").val().trim().length == 0) {
+                        alert('연락처를 입력하세요~~')
+                    }else if(!chkPhone(phone)){
+                        alert('연락처는 숫자만!')
+                    }else if($("input[name=address]").val().trim().length == 0){
+                        alert('주소를입력하세요~~')
+                    }else if($("#eval").val().trim().length==0){
+                        alert("아이디중복확인해주세요~")
+                    }
+                    else{
+                        $.ajax({
+                            url: '/member',
+                            type: 'POST',
+                            data: formdata,
+                            // contentType: 'application/json',
+                            // dataType: 'json',
+                            error: function(xhr, status, error){
+                                alert('회원가입에 실패하였습니다. ');
+                            },
+                            success: function(json){
+                                alert('회원가입이 완료됐습니다. ')
+                                location.href="/";
+                            }
+                        });
+                    }
+                });
+            });
+
+            function chkPhone(s) {
+                for (i=0; i<s.length; i++) {
+                    c = s.substr(i, 1);
+                    if (c < "0" || c > "9") return false;
+                }
+                return true;
+            }
+        </script>
+    </th:block>
+</div>
+
+</body>
+<script>
+
+
+</script>
+</html>

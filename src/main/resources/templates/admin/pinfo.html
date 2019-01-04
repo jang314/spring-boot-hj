@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block layout:fragment="css">
+    <script th:inline="javascript"></script>
+</th:block>
+<div layout:fragment="content">
+    <div>
+        <h1>상품수정</h1>
+    </div>
+    <div style="margin: 0 auto; width: 1100px; min-width: 1100px;">
+        <div>
+            <form enctype="multipart/form-data" action="/product" name="update"  id="uploadform">
+                <table style="border: 1px solid #ddd; margin: 0 auto;">
+                    <input type="hidden" name="id" th:value="${id}" id="id">
+                    <tr>
+                        <th>상품명</th>
+                        <td colspan="3">
+                            <input type="text" name="pname" id="name" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>가격</th>
+                        <td>
+                            <input type="text" name="price" id="price" value="">
+                        </td>
+                        <th>재고</th>
+                        <td>
+                            <input type="text" name="stock" id="stock" value="" readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>설명</th>
+                        <td colspan="3">
+                            <textarea name="content" id="content" value=""></textarea>
+                        </td>
+                    </tr>
+                    <input type="hidden" name="regdate" id="regdate" value="">
+                    <tr>
+                        <th>파일첨부</th>
+                        <td colspan="3">
+                            <input type="text" value="" id="img" readonly>
+                            <input type="file" name="file" value=""></td>
+                    </tr>
+                </table>
+                <p style="text-align: center">
+                    <a href="/product" id="uploadBtn">수정</a>
+                </p>
+            </form>
+        </div>
+    </div>
+            <th:block>
+            <script th:inline="javascript">
+            var id = $("#id").val();
+            $.getJSON('/product/'+id)
+                .done(function (data) {
+                    $("#name").val(data.pname);
+                    $("#regdate").val(data.regdate);
+                    $("#stock").val(data.stock);
+                    $("#price").val(data.price);
+                    $("#content").val(data.content);
+                    $("#img").val(data.file);
+                })
+
+            $("#uploadBtn").click(function (e) {
+                e.preventDefault();
+                var form = $('form')[0];
+                var formdata = new FormData(form);
+                console.log(formdata)
+                $.ajax({
+                    url: '/product',
+                    type: 'PUT',
+                    data: formdata,
+                    processData: false,
+                    contentType: false,
+                    enctype : 'multipart/form-data',
+                    // dataType: 'json',
+                    error: function(xhr, status, error){
+                        alert('업로드 실패');
+                    },
+                    success: function(json){
+                        alert('상품수정이 완료됐습니다. ');
+                        location.href="/admin/plist"
+                    }
+                });
+            });
+        </script>
+    </th:block>
+</div>
+</body>
+</html>

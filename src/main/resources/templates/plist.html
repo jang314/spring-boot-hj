@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block layout:fragment="css">
+    <style>
+        #title { text-align: center; }
+        table tr td { text-align: center; }
+    </style>
+</th:block>
+<div layout:fragment="content">
+    <div>
+        <h1>상품목록</h1>
+    </div>
+    <div>
+        <div>
+            <div class="pro-box">
+            </div>
+            <div>
+                <ul class="page">
+                </ul>
+            </div>
+        </div>
+    </div>
+    <th:block>
+        <script th:inline="javascript">
+            var page = 0;
+            var first = true
+            var last = true
+            var totalPages = 0
+            callList = pagingList;
+            pagingList(page);
+            function  pagingList(page) {
+                $.getJSON('/product', {page: page})
+                    .done(function (data) {
+                        $(".pro-box").empty()
+                        for(var i=0; i<data.content.length; i++){
+                            var tag1 = "<div onclick='goDetail("+ data.content[i].id +")' style='border: 1px solid #ddd; cursor: pointer; width: 400px; margin-left: 10px; display: inline-block'>";
+                            tag1 += "<img src='/images/" + data.content[i].file + "'/>";
+                            tag1 += "<ul><li>" + data.content[i].pname + "</li>";
+                            tag1 += "<li>" + data.content[i].price + "</li>";
+                            tag1 += "</ul></div>";
+                            var tag = "<tr><td><a href='/admin/view/"+data.content[i].id+"'>"+data.content[i].pname+"</a></td>" +
+                                "<td>"+data.content[i].price+"원</td><td>"+ data.content[i].stock+"</td><td>"+
+                                data.content[i].regdate+"</td>";
+                            $(".pro-box").append(tag1);
+                        }
+                        $(".page").empty();
+                        for(var i=0; i< data.totalPages; i++){
+                            console.log(i)
+                            if (i == page){
+                                $(".page").append("<li style='display: inline-block'><a style='font-weight: bold;' href='javascript:void(0)' onclick='return false;'>"+(i+1)+"</a></li>");
+                            }else{
+                                $(".page").append("<li style='display: inline-block'><a href='javascript:void(0)' onclick='pagingList("+(i)+")'>" +  (i+1) + "</a></li>");
+                            }
+                        }
+                    })
+            }
+            function goDetail(id){
+                location.href="pinfo/" + id;
+            }
+        </script>
+    </th:block>
+</div>
+</body>
+</html>

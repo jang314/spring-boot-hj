@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div>
+        <h1>상품상세보기</h1>
+    </div>
+    <div>
+        <input type="hidden" id="id" th:value="${id}">
+        <table class="pdetail">
+            <tr>
+                <th>상품명</th>
+                <td id="name"></td>
+            </tr>
+            <tr>
+                <th>등록일</th>
+                <td id="regdate"></td>
+            </tr>
+            <tr>
+                <th>재고</th>
+                <td id="stock"></td>
+            </tr>
+            <tr>
+                <th>가격</th>
+                <td id="price"></td>
+            </tr>
+            <tr>
+                <th>상세설명</th>
+                <td id="content"></td>
+            </tr>
+            <tr>
+                <th>이미지</th>
+                <td id="img"></td>
+            </tr>
+        </table>
+        <div style="margin-top: 50px; text-align: center;">
+            <a href="#" id="goUpdate">정보수정</a>
+            <a href="#" id="deleteProd">상품삭제</a>
+        </div>
+    </div>
+    <th:block>
+        <script th:inline="javascript">
+            var id = $("#id").val();
+            $.getJSON('/product/'+id)
+                .done(function (data) {
+                    $("#name").append(data.pname);
+                    $("#regdate").append(data.regdate);
+                    $("#stock").append(data.stock);
+                    $("#price").append(data.price);
+                    $("#content").append(data.content);
+                    $("#img").append("<img src='/images/"+ data.file +"'/>")
+                })
+
+            $("#goUpdate").click(function (e) {
+                e.preventDefault();
+                
+                location.href = "/admin/update/"+id;
+            });
+
+
+
+            $("#deleteProd").click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/product',
+                    method: 'delete',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    error: function (xhr, status, error) {
+                        alert('상품삭제에 실패했습니다. ');
+                    },
+                    success: function () {
+                        alert('상품삭제가 완료됐습니다. ');
+                        location.href = "/admin/plist";
+                    }
+                })
+            });
+        </script>
+    </th:block>
+</div>
+</body>
+</html>

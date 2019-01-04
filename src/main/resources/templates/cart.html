@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block layout:fragment="css">
+    <script th:inline="javascript"></script>
+</th:block>
+<div layout:fragment="content">
+    <form id="form">
+    <div th:object="${member}">
+        <input type="hidden" name="uid" id="uid" th:value="*{uid}">
+        <h1>장바구니</h1>
+        <div>
+            <table style="border: 1px solid #d8d8d8; margin: 0 auto; ">
+                <tr id="tblth">
+                    <th>번호</th>
+                    <th>상품명</th>
+                    <th>가격</th>
+                    <th>개수</th>
+                    <th></th>
+                </tr>
+            </table>
+            <div>
+                <p id="total" style="text-align: center"></p>
+                <p style="text-align: center">
+                    <a href="#" id="goOrder">주문하기</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    </form>
+    <th:block>
+        <script th:inline="javascript">
+            var id = $("#id").val();
+            var uid = $("#uid").val();
+            console.log(uid);
+            $.getJSON('/cart/'+uid)
+                .done(function (data) {
+                var totalPrice = 0;
+                var arr = new Array();
+
+                    for(var i=0; i<data.length; i++){
+                        var tag = "<tr>";
+                        tag+= "<td>" + data[i].id + "</td>";
+                        tag+= "<td><a href='/pinfo/" + data[i].prodId + "'>" + data[i].prodName + "</a></td>";
+                        tag+= "<td>" + data[i].prodPrice + "원</td>";
+                        tag+= "<td><input type='text' name='amount' id='amount"+i+"' value='" + data[i].amount + "' style='width: 20px'>개<input type='button' value='수정' onclick='goModify(" + data[i].id + "," + i + ")'></td>";
+                        tag+= "<td><input type='button' id='delete' onclick='goDelete("+ data[i].id +")' value='삭제'></td>";
+                        tag+= "</tr>";
+                        // var totalPrice = 0;
+                        totalPrice += ( data[i].prodPrice * data[i].amount);
+                        $("#tblth").after(tag);
+                        arr[i]=data[i].id;
+                    }
+                    $("#total").append("총" + totalPrice + "원");
+
+                    $("#goOrder").click(function (e) {
+                        e.preventDefault();
+                        if(arr.length==0){
+                            alert('장바구니 목록이 비어있습니다. ')
+                        }else{
+                            if(confirm('주문하시겠습니까?')){
+                                $.ajax({
+                                    url: '/order',
+                                    method: 'post',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({
+                                        id: arr
+                                    }),
+                                    error: function (xhr, status, error) {
+                                        alert('주문하기에 실패했습니다. ');
+                                    },
+                                    success: function () {
+                                        alert("성공")
+                                        location.href="/oinfo";
+                                    }
+                                })
+                            }
+                        }
+                    });
+                })
+
+
+            function goDelete(id){
+                $.ajax({
+                    url: '/cart',
+                    method: 'delete',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    error: function (xhr, status, error) {
+                        alert('상품삭제에 실패했습니다. ');
+                    },
+                    success: function () {
+                        alert('상품삭제가 완료됐습니다. ');
+                        location.reload();
+                    }
+                })
+            }
+            function goModify(id, i){
+                var amount =  $("#amount"+i).val()
+                $.ajax({
+                    url: '/cart',
+                    method: 'put',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id,
+                        amount: amount
+                    }),
+                    error: function (xhr, status, error) {
+                        alert('수정에 실패했습니다. ');
+                    },
+                    success: function () {
+                        alert('수정이 완료됐습니다. ');
+                    }
+                })
+            }
+        </script>
+    </th:block>
+</div>
+</body>
+</html>

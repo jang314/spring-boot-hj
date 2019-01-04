@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block layout:fragment="css">
+    <script th:inline="javascript"></script>
+</th:block>
+<div layout:fragment="content">
+    <div>
+        <h1>상품등록</h1>
+    </div>
+    <div style="margin: 0 auto; width: 1100px; min-width: 1100px;">
+        <div>
+            <form enctype="multipart/form-data" action="/product" name="upload" method="post" id="uploadform">
+            <table style="border: 1px solid #ddd; margin: 0 auto;">
+                <tr>
+                    <th>상품명</th>
+                    <td colspan="3">
+                        <input type="text" name="pname" value="">
+                    </td>
+                </tr>
+                <tr>
+                    <th>가격</th>
+                    <td>
+                        <input type="text" name="price" value="">
+                    </td>
+                    <th>재고</th>
+                    <td>
+                        <input type="text" name="stock" value="">
+                    </td>
+                </tr>
+                <tr>
+                    <th>설명</th>
+                    <td colspan="3">
+                        <textarea id="content" name="content" value=""></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>파일첨부</th>
+                    <td colspan="3"><input type="file" name="file" value="" id="file"></td>
+                </tr>
+            </table>
+                <p>
+                    <a href="/product" id="uploadBtn">등록</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    <th:block layout:fragment="js">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                $("#uploadBtn").click(function (e) {
+                    e.preventDefault();
+                    alert($("input[name=file]").val());
+                    var ext = $('#file').val().split('.').pop().toLowerCase();
+                    var form = $('form')[0];
+                    var formdata = new FormData(form);
+                    if($("input[name=pname]").val().trim().length==0){
+                        alert('상품명을 입력하세요')
+                        return false
+                    }else if($("input[name=price]").val().trim().length==0){
+                        alert('가격을입력하세요')
+                        return false
+                    }else if($("input[name=stock]").val().trim().length==0){
+                        alert('재고를 입력하게요')
+                        return false;
+                    }else if($("#content").val().trim().length==0){
+                        alert('상품설명을 입력하세요')
+                        return false
+                    }else if(!chkNumber($("input[name=price]").val()) || !chkNumber($("input[name=stock]").val())){
+                        alert('올바른형식의 데이터를 입력하세요')
+                        return false
+                    }else if($("#file").val().trim().length==0){
+                        alert('파일을 업로드해주세요')
+                        return false;
+                    }else if($.inArray(ext, ['gif','png','jpg','jpeg']) == -1) {
+                        alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+                        return false;
+                    }else{
+                        $.ajax({
+                            url: '/product',
+                            type: 'POST',
+                            data: formdata,
+                            processData: false,
+                            contentType: false,
+                            enctype : 'multipart/form-data',
+                            // dataType: 'json',
+                            error: function(xhr, status, error){
+                                alert('업로드 실패');
+                            },
+                            success: function(json){
+                                alert('상품등록이 완료됐습니다. ');
+                                location.href="/admin/plist";
+                            }
+                        });
+                    }
+                });
+            });
+
+            function chkNumber(val) {
+                for (i=0; i<val.length; i++) {
+                    c = val.substr(i, 1);
+                    if (c < "0" || c > "9") return false;
+                }
+                return true;
+            }
+        </script>
+    </th:block>
+</div>
+</body>
+</html>

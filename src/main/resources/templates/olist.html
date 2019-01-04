@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>주문내역</h1>
+    <div class="order-info-wrap">
+    </div>
+    <th:block>
+    <script th:inline="javascript">
+        $.getJSON('/order')
+            .done(function (data) {
+                for(var i=0; i<data.length; i++){
+                    var tag = "<table style='border: 1px solid #ccc'>";
+                    tag+="<input type='hidden' name='id' value='"+data[i].id+"'>";
+                    tag+="<tr><th>주문번호</th><td>"+data[i].orderId+"</td></tr>";
+                    tag+="<tr><th>주문상태</th><td>"+data[i].status+"<input type='button' name='status' value='주문취소' onclick='cancelBtn("+data[i].id+")'></td>";
+                    for(var j=0; j <data[i].products.length; j++){
+                        tag+="<tr><th>상품명</th><td>"+data[i].products[j].prodName+"</td></tr>";
+                        tag+="<tr><th>가격</th><td>"+data[i].products[j].price+"원</td></tr>";
+                        tag+="<tr><th>구매수량</th><td>"+data[i].products[j].amount+"개</td>"
+                    }
+                    tag+="<tr><th>총 결제금액</th><td>"+data[i].totalPrice+"원</td></tr>";
+                    tag+="</table>";
+
+                    $(".order-info-wrap").append(tag);
+                }
+            })
+
+        function cancelBtn(id) {
+            $.getJSON('/order/'+id).done(function (data) {
+                if(data===true){
+                    if(confirm('주문을 취소하시겠습니까? ')){
+                        $.ajax({
+                            url: '/order',
+                            method: 'put',
+                            contentType: 'application/json',
+                            // dataType: 'json',
+                            data: JSON.stringify({
+                                id: id
+                            }),
+                            error: function(xhr, status, error, data){
+                                alert('주문취소 실패')
+                            },
+                            success: function(json){
+                                alert('주문취소 요청이 완료되었습니다. ')
+                                location.reload()
+                            }
+                        });
+                    }
+                }else{
+                    alert('이미 취소요청상태를 하였습니다. ');
+                }
+            });
+
+        }
+    </script>
+    </th:block>
+</div>
+</body>
+</html>

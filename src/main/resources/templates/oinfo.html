@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.springframework.org/schema/security"
+      layout:decorator="/layout/default">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>주문하기</h1>
+    <div th:value="${form}">
+        <p></p>
+        <h2 style="text-align: center">주문목록</h2>
+        <p></p>
+        <table th:object="${form}" style="margin: 0 auto" >
+            <tr>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>개수</th>
+            </tr>
+            <tr th:each="info, iterStat:${form}">
+                <input type="hidden" th:name="prodId+${iterStat.index}" class="prodId" th:value="${info.prodId}">
+                <input type="hidden" th:name="amount+${iterStat.index}" class="amount" th:value="${info.amount}">
+                <td>[[${info.prodName}]]</td>
+                <td>[[${info.prodPrice}]]원</td>
+                <td>[[${info.amount}]]</td>
+            </tr>
+        </table>
+        <div style="text-align: center">
+            총 결제금액 : <span th:text="${totalPrice}"></span>원
+            <input type="hidden" th:value="${totalPrice}" name="totalPrice">
+        </div>
+    </div>
+    <div>
+        <h2 style="text-align: center">주문자정보</h2>
+        <table th:object="${member}" style="margin: 0 auto;">
+            <tr>
+                <th>이름</th>
+                <td th:text="*{uname}"></td>
+            </tr>
+            <tr>
+                <th>연락처</th>
+                <td th:text="*{phone}"></td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td th:text="*{address}"></td>
+            </tr>
+        </table>
+    </div>
+    <div style="text-align: center">
+        <a href="#" id="goOrder">주문하기</a>
+    </div>
+    <th:block>
+        <script th:inline="javascript">
+            $("#goOrder").click(function (e) {
+                e.preventDefault();
+                var pid = new Array();
+                var pamount = new Array();
+                var totalPrice = $("input[name='totalPrice']").val();
+                for(i=0; i<$('.prodId').length; i++){
+                    pid[i] = $("input[name='prodId" + i + "']").val();
+                    pamount[i] = $("input[name='amount" + i + "']").val();
+                }
+                $.ajax({
+                    url: '/order/addOrders',
+                    method: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: pid,
+                        amount: pamount,
+                        totalPrice : totalPrice
+                    }),
+                    error: function (xhr, status, error) {
+                        alert('주문하기에 실패했습니다. ');
+                    },
+                    success: function () {
+                        alert("주문되었습니다")
+                        location.href="/olist";
+                    }
+                })
+            });
+        </script>
+    </th:block>
+</div>
+</body>
+</html>
